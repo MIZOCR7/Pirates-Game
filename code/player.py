@@ -2,7 +2,7 @@ from settings import *
 from timer import Timer
 
 class Player(pygame.sprite.Sprite):
-  def __init__(self, pos, groups, collosion_sprites):
+  def __init__(self, pos, groups, collosion_sprites, semi_collosion_sprites):
     super().__init__(groups)
     self.image = pygame.Surface((48,56))
     self.image.fill('red')
@@ -17,7 +17,10 @@ class Player(pygame.sprite.Sprite):
     self.jump_height = 900
     
     self.collosion_sprites = collosion_sprites
+    self.semi_collosion_sprites = semi_collosion_sprites
     self.on_surface = {'floor': False, 'left': False, "right": False}
+    self.platform = None 
+    
     
     self.timers = {
       'wall jump' : Timer(400),
@@ -50,17 +53,24 @@ class Player(pygame.sprite.Sprite):
       self.direction.y += self.gravity / 2 * dt 
       self.rect.y += self.direction.y * dt
       self.direction.y += self.gravity / 2 * dt 
-      self.collosion('vertical')
+
       
     if self.jump:
       if self.on_surface['floor']:
         self.direction.y = -self.jump_height
         self.timers['wall slide block'].activate()
+        self.rect.bottom -= 1
       elif any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide block'].active:
          self.timers['wall jump'].activate()
          self.direction.y = -self.jump_height 
          self.direction.x = 1 if self.on_surface['left'] else -1
       self.jump = False
+      
+    self.collosion('vertical')
+    self.semi_collosion()
+  def platform_move(self, dt):
+    if self.platform:
+      self.rect.topleft += self.platform.direction * self.platform.speed * dt 
   
   def check_contact(self):
     floor_rect = pygame.Rect(self.rect.bottomleft, (self.rect.width,2))
@@ -74,28 +84,38 @@ class Player(pygame.sprite.Sprite):
     self.on_surface['right'] = True if right_rect.collidelist(collide_rects) >= 0 else False 
     self.on_surface['left'] = True if left_rect.collidelist(collide_rects) >= 0 else False 
     
+    self.platform = None
+    for sprite in [sprite for sprite in self.collosion_sprites if hasattr(sprite, 'moving')]:
+      if sprite.rect.colliderect(floor_rect):
+        self.platform = sprite
     
   
   def collosion(self, axis):
     for sprite in self.collosion_sprites:
       if sprite.rect.colliderect(self.rect):
         if axis == 'horizontal':
-          if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+          if self.rect.left <= sprite.rect.right and int(self.old_rect.left) >= sprite.old_rect.right:
             self.rect.left = sprite.rect.right
           
-          if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+          if self.rect.right >= sprite.rect.left and int(self.old_rect.right) <= sprite.old_rect.left:
             self.rect.right = sprite.rect.left
         else:
-          for sprite in self.collosion_sprites:
-            if sprite.rect.colliderect(self.rect):
-              if axis == 'vertical':
-                if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-                  self.rect.top = sprite.rect.bottom
-                
-                if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-                  self.rect.bottom = sprite.rect.top 
-                
-                self.direction.y = 0
+          if self.rect.top <= sprite.rect.bottom and int(self.old_rect.top) >= sprite.old_rect.bottom:
+            self.rect.top = sprite.rect.bottom
+            if hasattr(sprite, 'moving'):
+              self.rect.top += 6
+          
+          if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= sprite.old_rect.top:
+            self.rect.bottom = sprite.rect.top 
+          
+          self.direction.y = 0
+  
+  
+  def semi_collosion(self):
+    for sprite in self.semi_collosion_sprites:
+       if sprite.rect.colliderect(self.rect):
+         if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+           self.rect.bottom = sprite.rect.top 
   
   
   def update_timers(self):
@@ -107,6 +127,7 @@ class Player(pygame.sprite.Sprite):
     self.update_timers()
     self.input()
     self.move(dt)
+    self.platform_move(dt)
     self.check_contact()
     
     
