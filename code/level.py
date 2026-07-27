@@ -1,10 +1,10 @@
 from settings import *
-from sprites import Sprite, MovingSprite
+from sprites import Sprite, AnimatedSprite, MovingSprite
 from player import Player
 from groups import AllSprites
 
 class Level:
-  def __init__(self, tmx_map):
+  def __init__(self, tmx_map, level_frames):
     self.display_surface = pygame.display.get_surface()
     
     
@@ -12,16 +12,40 @@ class Level:
     self.collosion_sprites = pygame.sprite.Group()
     self.semi_collosion_sprites = pygame.sprite.Group()
     
-    self.setup(tmx_map)
+    self.setup(tmx_map, level_frames) 
     
-  def setup(self, tmx_map):
-    for x, y, surf in tmx_map.get_layer_by_name('Terrain').tiles():
-      Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, (self.all_sprites, self.collosion_sprites))
+  def setup(self, tmx_map, level_frames):
     
-    for obj in tmx_map.get_layer_by_name('Objects'):
-      if obj.name == 'player':
-        self.player = Player((obj.x, obj.y), self.all_sprites, self.collosion_sprites, self.semi_collosion_sprites)
+    for layer in ['BG', "Terrain", "FG", "Platforms"]:
+      for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
+        groups = [self.all_sprites]
+        if layer == 'Terrain': groups.append(self.collosion_sprites)
+        if layer == 'Platforms': groups.append(self.semi_collosion_sprites)
+        match layer: 
+          case 'BG' : z = Z_LAYERS['bg tiles'] 
+          case 'FG' : z = Z_LAYERS['fg']
+          case _ : z = Z_LAYERS['main'] 
+        Sprite((x * TILE_SIZE,y * TILE_SIZE), surf, groups, z) 
     
+  
+    for layer_name in ['Objects', 'Decorations']:
+      if layer_name in [layer.name for layer in tmx_map.layers]:
+        for obj in tmx_map.get_layer_by_name(layer_name): 
+          if obj.name == 'player': 
+            self.player = Player(
+              pos = (obj.x, obj.y), 
+              groups = self.all_sprites, 
+              collosion_sprites = self.collosion_sprites, 
+              semi_collosion_sprites = self.semi_collosion_sprites,
+              frames = level_frames['player']) 
+          else: 
+            if obj.name in ('barrel', 'crate'):
+              Sprite((obj.x, obj.y), obj.image, (self.all_sprites, self.collosion_sprites))
+            else:  
+                frames = level_frames['palms'][obj.name] if 'palm' in obj.name else level_frames[obj.name] 
+                AnimatedSprite((obj.x, obj.y), frames, self.all_sprites)
+      
+      
     for obj in (tmx_map.get_layer_by_name("Moving Objects")):
       if obj.name == 'helicopter':
         if obj.width > obj.height:
