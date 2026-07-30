@@ -31,6 +31,13 @@ class Game:
             'small_chain': import_folder('..', 'graphics', 'level', 'small_chains'),
             'candle_light': import_folder('..', 'graphics', 'level', 'candle_light'),
             'player': import_sub_folders('..', 'graphics', 'player'),
+            'helicopter': import_folder('..', 'graphics', 'level', 'helicopter'),
+            'boat': import_folder('..', 'graphics', 'objects', 'boat'), 
+            'saw_chains': pygame.image.load(join(dirname(__file__), '..', 'graphics', 'enemies', 'saw', 'saw_chain.png')).convert_alpha(),
+            'spike': import_image('..', 'graphics', 'enemies', 'spike_ball', 'Spiked Ball.png'), 
+            'spike_chain': import_image('..', 'graphics', 'enemies', 'spike_ball', 'spiked_chain.png'), 
+            'tooth': import_folder('..', 'graphics', 'enemies', 'tooth', 'run'), 
+            
     }
     
     

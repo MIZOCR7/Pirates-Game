@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
     self.image = self.frames[self.state][self.frame_index]  
     
     
-    self.rect = self.image.get_frect(bottomleft = pos)
+    self.rect = self.image.get_frect(midbottom = pos)
     self.hitbox_rect = self.rect.inflate(-76, -34)
     self.old_rect = self.hitbox_rect.copy()
     
