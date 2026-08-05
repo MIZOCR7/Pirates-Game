@@ -1,5 +1,6 @@
 from settings import *
 from random import choice, random, randint 
+from timer import Timer 
 
 class Tooth(pygame.sprite.Sprite):
   def __init__(self, pos, frames, groups, collision_sprites):
@@ -30,3 +31,82 @@ class Tooth(pygame.sprite.Sprite):
       self.direction *= -1 
 
 
+
+class Shell(pygame.sprite.Sprite):
+  def __init__(self, pos, frames, groups, reverse, player, create_pearl):
+    super().__init__(groups) 
+    
+    if reverse:
+      self.frames = {} 
+      for key, surfs in frames.items():
+        self.frames[key] = [pygame.transform.flip(surf, True, False) for surf in surfs]  
+      self.bullet_dir = -1
+    else:
+      self.frames = frames 
+      self.bullet_dir = 1
+    
+    self.frame_index = 0
+    self.state = 'idle' 
+    
+    self.image = self.frames[self.state][self.frame_index]
+    self.rect = self.image.get_frect(topleft=pos) 
+    self.old_rect = self.rect.copy() 
+    self.z = Z_LAYERS['main'] 
+    self.player = player 
+    self.shoot_timer = Timer(3000) 
+    self.has_fired = False 
+    self.create_pearl = create_pearl 
+    
+  def state_management(self):
+    player_pos = vector(self.player.hitbox_rect.center)
+    shell_pos = vector(self.rect.center) 
+    player_near = shell_pos.distance_to(player_pos) < 500
+    player_front = shell_pos.x < player_pos.x if self.bullet_dir > 0 else shell_pos.x > player_pos.x 
+    player_level = abs(shell_pos.y - player_pos.y) < 30 
+    
+    if player_near and player_front and player_level and not self.shoot_timer.active:
+      self.state = 'fire' 
+      self.frame_index = 0
+      self.shoot_timer.activate()  
+      
+  def update(self, dt):
+    self.shoot_timer.update() 
+    self.state_management() 
+    
+    self.frame_index += ANIMATION_SPEED * dt 
+    if self.frame_index < len(self.frames[self.state]):
+      self.image = self.frames[self.state][int(self.frame_index)] 
+      
+      if self.state == 'fire' and int(self.frame_index) == 3 and not self.has_fired:
+        self.create_pearl(self.rect.center, self.bullet_dir) 
+        self.has_fired = True 
+      
+    else:
+      self.frame_index = 0 
+      if self.state == 'fire':
+        self.state = 'idle' 
+        self.has_fired = False 
+
+
+class Pearl(pygame.sprite.Sprite):
+  def __init__(self, pos, groups, surf, direction, speed):
+    self.pearl = True
+    super().__init__(groups)
+    self.image = surf
+    self.rect = self.image.get_frect(center=pos + vector(50 * direction,0))
+    self.direction = direction 
+    self.speed = speed
+    self.z = Z_LAYERS['main'] 
+    self.timers = {'lifetime': Timer(5000)}
+    self.timers['lifetime'].activate() 
+  
+  def move(self):
+    pass 
+  
+  def update(self, dt):
+    for timer in self.timers.values():
+      timer.update() 
+    
+    self.rect.x += self.direction * self.speed * dt 
+    if not self.timers['lifetime'].active:
+      self.kill() 

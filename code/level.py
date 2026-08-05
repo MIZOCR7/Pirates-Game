@@ -2,7 +2,7 @@ from settings import *
 from sprites import Sprite, AnimatedSprite, MovingSprite, Spike
 from player import Player
 from groups import AllSprites
-from enemies import Tooth
+from enemies import Tooth, Shell, Pearl
 
 class Level:
   def __init__(self, tmx_map, level_frames):
@@ -14,8 +14,11 @@ class Level:
     self.semi_collosion_sprites = pygame.sprite.Group()
     self.damage_sprites = pygame.sprite.Group()
     self.tooth_sprites = pygame.sprite.Group() 
+    self.pearl_sprites = pygame.sprite.Group() 
     
     self.setup(tmx_map, level_frames) 
+    
+    self.pearl_surf = level_frames['pearl']
     
   def setup(self, tmx_map, level_frames):
     
@@ -108,10 +111,32 @@ class Level:
       if obj.name == 'tooth':
         Tooth((obj.x, obj.y), level_frames['tooth'], (self.all_sprites, self.damage_sprites, self.tooth_sprites), self.collosion_sprites)  
     
+      if obj.name == 'shell':
+        Shell((obj.x, obj.y), level_frames['shell'], (self.all_sprites, self.collosion_sprites), obj.properties['reverse'], self.player, self.create_pearl)  
+  
+  def create_pearl(self, pos, direction):
+    Pearl(pos, (self.all_sprites, self.damage_sprites, self.pearl_sprites), self.pearl_surf, direction ,150)  
+    
+  def parel_collision(self):
+    for sprite in self.collosion_sprites:
+      pygame.sprite.spritecollide(sprite, self.pearl_sprites, True) 
+      
+  
+  def hit_collision(self):
+    for sprite in self.damage_sprites:
+      if sprite.rect.colliderect(self.player.hitbox_rect):
+        if hasattr(sprite, 'pearl'):
+          sprite.kill() 
+  
+  
   def run(self, dt):
-    self.display_surface.fill("black")
+    self.display_surface.fill("black") 
+    
     self.all_sprites.update(dt)
-    self.all_sprites.draw(self.player.hitbox_rect.center)
+    self.parel_collision() 
+    self.hit_collision() 
+    
+    self.all_sprites.draw(self.player.hitbox_rect.center) 
     
   
   
