@@ -2,6 +2,7 @@ from settings import *
 from level import Level
 from pytmx.util_pygame import load_pygame
 from os.path import dirname, join
+from data import Data 
 
 from support import *
 
@@ -14,9 +15,9 @@ class Game:
     pygame.display.set_caption("Pirate World")
     self.clock = pygame.time.Clock()
     self.import_assets()
-    
+    self.data = Data()
     self.tmx_maps = {0: load_pygame(join(dirname(__file__), '..', 'data', 'levels', 'omni.tmx'))} 
-    self.current_stage = Level(self.tmx_maps[0], self.level_frames)
+    self.current_stage = Level(self.tmx_maps[0], self.level_frames, self.data) 
     
   
   def import_assets(self):
@@ -39,6 +40,9 @@ class Game:
             'tooth': import_folder('..', 'graphics', 'enemies', 'tooth', 'run'), 
             'shell': import_sub_folders('..', 'graphics', 'enemies', 'shell'), 
             'pearl': import_image('..', 'graphics', 'enemies', 'bullets', 'pearl.png'), 
+            'items': import_sub_folders('..', 'graphics', 'items'), 
+            'particle': import_folder('..', 'graphics', 'effects', 'particle'), 
+            
             
     }
     
