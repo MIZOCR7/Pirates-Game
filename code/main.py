@@ -3,6 +3,8 @@ from level import Level
 from pytmx.util_pygame import load_pygame
 from os.path import dirname, join
 from data import Data 
+from debug import debug
+from ui import UI 
 
 from support import *
 
@@ -15,7 +17,8 @@ class Game:
     pygame.display.set_caption("Pirate World")
     self.clock = pygame.time.Clock()
     self.import_assets()
-    self.data = Data()
+    self.ui = UI(self.font, self.ui_frames)
+    self.data = Data(self.ui) 
     self.tmx_maps = {0: load_pygame(join(dirname(__file__), '..', 'data', 'levels', 'omni.tmx'))} 
     self.current_stage = Level(self.tmx_maps[0], self.level_frames, self.data) 
     
@@ -46,6 +49,12 @@ class Game:
             
     }
     
+    self.font = pygame.font.Font(join(dirname(__file__), '..', 'graphics', 'ui', 'RUNESCAPE_UF.ttf'), 40)
+    self.ui_frames = {
+      'heart': import_folder('..', 'graphics', 'ui', 'heart'), 
+      'coin': import_image('..', 'graphics', 'ui', 'coin.png'),
+    }
+    
     
   
   def run(self):
@@ -57,8 +66,10 @@ class Game:
           sys.exit()
       
       self.current_stage.run(dt)
+      self.ui.update(dt) 
       
-      pygame.display.update()
+      pygame.display.update() 
+      
 
 
 if __name__ == "__main__":

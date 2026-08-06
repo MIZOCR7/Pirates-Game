@@ -45,7 +45,9 @@ class Level:
               groups = self.all_sprites, 
               collosion_sprites = self.collosion_sprites, 
               semi_collosion_sprites = self.semi_collosion_sprites,
-              frames = level_frames['player']) 
+              frames = level_frames['player'],
+              data=self.data, 
+              ) 
           else: 
             if obj.name in ('barrel', 'crate'):
               Sprite((obj.x, obj.y), obj.image, (self.all_sprites, self.collosion_sprites))
@@ -117,7 +119,7 @@ class Level:
         Shell((obj.x, obj.y), level_frames['shell'], (self.all_sprites, self.collosion_sprites), obj.properties['reverse'], self.player, self.create_pearl)  
     
     for obj in tmx_map.get_layer_by_name('Items'):
-      Item(obj.name, (obj.x + TILE_SIZE / 2, obj.y + TILE_SIZE / 2), level_frames['items'][obj.name], (self.all_sprites, self.item_sprites)) 
+      Item(obj.name, (obj.x + TILE_SIZE / 2, obj.y + TILE_SIZE / 2), level_frames['items'][obj.name], (self.all_sprites, self.item_sprites), self.data) 
     
     
   def create_pearl(self, pos, direction):
@@ -142,6 +144,7 @@ class Level:
     if self.item_sprites:
       item_sprites = pygame.sprite.spritecollide(self.player, self.item_sprites, True) 
       if item_sprites:
+        item_sprites[0].active() 
         ParticleEffectSprite((item_sprites[0].rect.center), self.particle_surf, self.all_sprites) 
         
   
