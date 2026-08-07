@@ -1,5 +1,5 @@
 from settings import *
-from sprites import Sprite, Cloud
+from sprites import Sprite, Cloud, Node
 from random import choice, randint
 from timer import Timer
 
@@ -91,3 +91,34 @@ class AllSprites(pygame.sprite.Group):
       offset_pos = sprite.rect.topleft + self.offset 
       self.display_surface.blit(sprite.image, offset_pos) 
       
+
+class WorldSprites(pygame.sprite.Group):
+  def __init__(self, data):
+    super().__init__()
+    self.display_surf = pygame.display.get_surface()
+    self.offset = vector()
+    self.data = data
+    
+  def draw(self, target_pos):
+    self.offset.x = -(target_pos[0] - WINDOW_WIDTH / 2)
+    self.offset.y = -(target_pos[1] - WINDOW_HEIGHT / 2) 
+    
+    for sprite in sorted(self, key=lambda sprite: sprite.z):
+      if sprite.z < Z_LAYERS['main']:
+        if sprite.z == Z_LAYERS['path']:
+          if sprite.level <= self.data.unlocked_level:
+            self.display_surf.blit(sprite.image, sprite.rect.topleft + self.offset)
+        else:
+          self.display_surf.blit(sprite.image, sprite.rect.topleft + self.offset) 
+
+  
+    for sprite in sorted(self, key=lambda sprite: sprite.rect.centery):
+      if sprite.z == Z_LAYERS['main']:
+        if hasattr(sprite, 'icon'):
+          self.display_surf.blit(sprite.image, sprite.rect.topleft + self.offset + vector(0, -20))
+        else:
+          self.display_surf.blit(sprite.image, sprite.rect.topleft + self.offset)
+    
+    
+    
+    
