@@ -20,7 +20,8 @@ def import_folder(*path):
 
 def import_folder_dict(*path):
   frame_dict = {}
-  for folder_path, _, image_names in walk(join(*path)):
+  base_path = join(dirname(__file__), *path)
+  for folder_path, _, image_names in walk(base_path):
     for image_name in image_names:
       full_path = join(folder_path, image_name)
       surface = pygame.image.load(full_path).convert_alpha()
