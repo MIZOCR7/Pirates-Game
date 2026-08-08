@@ -24,4 +24,6 @@ Download the latest `.exe` file directly from the **[Releases](../../releases)**
 | <kbd>Spacebar</kbd> | Jump |
 
 ---
+<img width="1280" height="753" alt="pirate" src="https://github.com/user-attachments/assets/893ffe68-8119-4368-abed-3e35867f4e5e" />
+
 
