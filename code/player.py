@@ -4,7 +4,7 @@ from os.path import join
 from math import sin
 
 class Player(pygame.sprite.Sprite):
-  def __init__(self, pos, groups, collosion_sprites, semi_collosion_sprites, frames, data): 
+  def __init__(self, pos, groups, collosion_sprites, semi_collosion_sprites, frames, data, attack_sound, jump_sound): 
     super().__init__(groups)
     self.z = Z_LAYERS['main'] 
     self.data = data 
@@ -39,6 +39,8 @@ class Player(pygame.sprite.Sprite):
       'hit': Timer(400),
     }
     
+    self.jump_sound = jump_sound
+    self.attack_sound = attack_sound
     
   def input(self):
     keys = pygame.key.get_pressed()
@@ -66,6 +68,7 @@ class Player(pygame.sprite.Sprite):
       self.attacking = True 
       self.frame_index = 0
       self.timers['attack block'].activate() 
+      self.attack_sound.play()
   
   def move(self, dt):
     self.hitbox_rect.x += self.direction.x * self.speed * dt
@@ -85,10 +88,14 @@ class Player(pygame.sprite.Sprite):
         self.direction.y = -self.jump_height
         self.timers['wall slide block'].activate()
         self.hitbox_rect.bottom -= 1 
+        self.jump_sound.set_volume(0.2)
+        self.jump_sound.play()
       elif any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide block'].active:
          self.timers['wall jump'].activate()
          self.direction.y = -self.jump_height 
          self.direction.x = 1 if self.on_surface['left'] else -1
+         self.jump_sound.set_volume(0.2)
+         self.jump_sound.play()
       self.jump = False
       
     self.collosion('vertical')

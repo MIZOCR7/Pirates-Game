@@ -20,11 +20,33 @@ class Game:
     self.import_assets()
     self.ui = UI(self.font, self.ui_frames)
     self.data = Data(self.ui) 
-    self.tmx_maps = {0: load_pygame(join(dirname(__file__), '..', 'data', 'levels', 'omni.tmx'))} 
+    self.tmx_maps = {
+      0: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '0.tmx')),
+      1: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '1.tmx')),
+      2: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '2.tmx')),
+      3: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '3.tmx')),
+      4: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '4.tmx')),
+      5: load_pygame(join(dirname(__file__), '..', 'data', 'levels', '6.tmx')),
+      } 
     self.tmx_overworld = load_pygame(join(dirname(__file__), '..', 'data', 'overworld', 'overworld.tmx'))
-    # self.current_stage = Level(self.tmx_maps[0], self.level_frames, self.data) 
-    self.current_stage = World(self.tmx_overworld, self.data, self.overworld_frames)
+    self.current_stage = Level(self.tmx_maps[0], self.level_frames, self.audio_files, self.data, self.switch_stage) 
     
+    self.bg_music.play(-1)
+    
+  def switch_stage(self, target, unlock = 0):
+    if target == 'level':
+      self.current_stage = Level(self.tmx_maps[self.data.current_level], self.level_frames, self.audio_files, self.data, self.switch_stage)
+      
+    else:
+      if unlock > 0:
+        self.data.unlocked_level = unlock
+      else:
+        self.data.health -= 1
+        self.audio_files['health'].set_volume(0.4)
+        self.audio_files['health'].play()
+      self.current_stage = World(self.tmx_overworld, self.data, self.overworld_frames, self.switch_stage)
+      
+  
   
   def import_assets(self):
     self.level_frames = {
@@ -68,6 +90,21 @@ class Game:
       'path': import_folder_dict('..', 'graphics', 'overworld', 'path'),
       'icon': import_sub_folders('..', 'graphics', 'overworld', 'icon'),
     }
+    
+    self.audio_files = {
+      'coin': pygame.mixer.Sound(join('audio', 'coin.mp3')),
+      'attack': pygame.mixer.Sound(join('audio', 'attack.wav')),
+      'jump': pygame.mixer.Sound(join('audio', 'jump.mp3')),
+      'damage': pygame.mixer.Sound(join('audio', 'damage.wav')),
+      'health': pygame.mixer.Sound(join('audio', 'damage.mp3')),
+      'pearl': pygame.mixer.Sound(join('audio', 'pearl.mp3')),
+    }
+    self.bg_music = pygame.mixer.Sound(join('audio', 'background.mp3'))
+    self.bg_music.set_volume(0.3)
+  def check_game_over(self):
+    if self.data.health <= 0:
+      pygame.quit()
+      sys.exit
   
   def run(self):
     while True:
@@ -77,6 +114,7 @@ class Game:
           pygame.quit()
           sys.exit()
       
+      self.check_game_over()
       self.current_stage.run(dt)
       self.ui.update(dt) 
       
