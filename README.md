@@ -1,21 +1,41 @@
 # Pirates-Game
 
-Pirate game a game that returns us to the old days when we were just playing arcade games and we were so happy, this game has changed my mindset in making games with pygame because I have used a new technique I have not use before in the old simple games I started this game with a new order of sprites and classes and tons of files working together this helped me a lot at first I found some issues bcs first time working with all those complex stuff but when I turned to another project worked with same technique and returned to continue this project everything was clear and helped me a lot to handle all this complexity. Make Sure to win bcs I think i made it quite hard to win easily at all good luck :).
+## Description
 
-## What I learnt
-Dealing with multiple classes in OOP is insane and makes your time worth wasting for sure :)
+Pirate game, a game that returns us to the old days when we were just playing arcade games and we were so happy.
 
+This game has changed my mindset in making games with Pygame because I have used a new technique I had not used before in the old simple games. I started this game with a new order of sprites and classes, and tons of files working together.
 
-## How to Run
-### Option 1: Standalone Executable (Quickest)
-Download the latest `.exe` file directly from the **[Releases](../../releases)** section and run it.
+This helped me a lot. At first, I found some issues because it was my first time working with all those complex stuff, but when I moved to another project, worked with the same technique, and returned to continue this project, everything was clear and helped me a lot to handle all this complexity.
 
-### Option 2: Run from Source
+Make sure to win because I think I made it quite hard to win easily at all. Good luck :).
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/your-username/Pirates-Game.git](https://github.com/your-username/Pirates-Game.git)
-   cd Pirates-Game
+### Screenshots
+
+<img width="1280" height="753" alt="pirate" src="https://github.com/user-attachments/assets/893ffe68-8119-4368-abed-3e35867f4e5e" />
+
+## Getting Started
+
+### Dependencies
+
+- Python
+- Pygame
+
+### Installing
+
+- Clone the repository:
+
+```bash
+git clone https://github.com/your-username/Pirates-Game.git
+cd Pirates-Game
+```
+
+### Executing program
+
+- Run the game from the source code.
+- Make sure you have the required dependencies installed.
+- Execute the main Python file to start playing.
+
 ## Controls
 
 | Key | Action |
@@ -27,7 +47,14 @@ Download the latest `.exe` file directly from the **[Releases](../../releases)**
 | <kbd>X</kbd> | Attack |
 | <kbd>Spacebar</kbd> | Jump |
 
----
-<img width="1280" height="753" alt="pirate" src="https://github.com/user-attachments/assets/893ffe68-8119-4368-abed-3e35867f4e5e" />
+## Help
 
+If you face any problems running the game, make sure Pygame is installed correctly and that all the project files are in their original locations.
 
+## What I Learnt
+
+Dealing with multiple classes in OOP is insane and makes your time worth wasting for sure :)
+
+## License
+
+This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details.
